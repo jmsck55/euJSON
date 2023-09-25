@@ -100,15 +100,17 @@ function parse_json_objects_and_arrays(sequence st)
             if length(a) < 3 then
                 return {GET_SUCCESS, st}
             else
-                return {GET_EOF, s}
+                exit
+                -- return {GET_EOF, s}
             end if
         end if
         s = append(s, st[1..a[1]-1]) -- save "intro" to JSON
-        st = st[a[2]+1..$] -- to be saved at the end, "last"
-        kind = a[3] -- 1 or 2
-        a = a[4][2..$-1] -- delimitted tag.
-        a = remove_whitespace(a)
---here.
+        st = st[a[2]+1..$] -- to be saved at the end
+        -- kind = a[3] -- 1 or 2
+        a = a[4] -- [2..$-1] -- delimitted tag.
+        -- a = remove_whitespace(a)
+        s = append(s, a)
+    end while
 
 --        pos = find_any("{[", st)
 --        if pos then
