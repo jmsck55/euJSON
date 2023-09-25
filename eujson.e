@@ -88,6 +88,8 @@ function get_contents(sequence st, integer delims = {"{[", "}]"})
 end function
 
 function parse_json_objects_and_arrays(sequence st)
+-- process all the nested containers (objects and arrays) first, then go back and start at the top and process the content when there are no more containers to process.
+
     integer pos, ch, f, kind
     sequence a, ele, tmp, list, s = {}
     st = remove_whitespace(st)
