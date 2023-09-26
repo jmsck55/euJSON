@@ -108,10 +108,10 @@ function parse_json_objects_and_arrays(sequence st)
 -- process all the nested containers (objects and arrays) first,
 -- then go back and start at the top and process the content,
 -- when there are no more containers to process.
+    --here.
     
---here.
-
-    return 0
+    
+    return {GET_SUCCESS, st}
 end function
 
 public function parse(sequence json_string)
