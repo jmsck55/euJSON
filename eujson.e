@@ -30,19 +30,17 @@ end function
 function elementize_strings(sequence st)
     -- done.
     integer start, pos
-    pos = 0
-    while pos < length(st) do
-        pos = find('\"', st, pos + 1)
-        if not pos then
+    start = 0
+    while start < length(st) do
+        start = find('\"', st, start + 1)
+        if not start then
             exit
         end if
-        start = pos
-        pos = find('\"', st, pos + 1)
+        pos = find('\"', st, start + 1)
         if not pos then
             return {GET_EOF, st} -- syntax error
         end if
         st = replace(st, {st[start..pos]}, start, pos)
-        pos = start + 1
     end while
     return {GET_SUCCESS, st}
 end function
