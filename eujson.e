@@ -118,10 +118,11 @@ public function parse(sequence json_string)
     -- parse JSON string to Euphoria object (key:value pairs)
 
     sequence s
-    s = elementize_escape_chars(json_string)
-    if s[1] != GET_SUCCESS then
-        return s
-    end if
+    s = sprintf("%s", {s})
+    --s = elementize_escape_chars(json_string)
+    --if s[1] != GET_SUCCESS then
+    --    return s
+    --end if
     s = elementize_strings(s[2])
     if s[1] != GET_SUCCESS then
         return s
