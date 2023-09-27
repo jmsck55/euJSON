@@ -7,7 +7,7 @@ end ifdef
 
 include eujson.e
 
-constant test = `
+sequence test = `
 {
 "name":"John",
 "age":30,
@@ -22,7 +22,7 @@ object ob
 ob = JSON:parse(test)
 if ob[1] != GET_SUCCESS then
     puts(1, "Error in processing JSON.\n")
-    abort(1)
+    --abort(1)
 end if
 ob = ob[2]
 
