@@ -1,13 +1,14 @@
 
 -- stringify(), parse()
+-- use "map()" for associative array
 
 namespace JSON
 
---include std/map.e
+include std/map.e
 include std/search.e
 public include std/get.e
 
-function elementize_escape_chars(sequence st, sequence escape_chars = "\\tnr")
+function elementize_escape_chars(sequence st, sequence escape_chars = "\\\'\"tnr")
     -- done.
     integer pos
     pos = 1
@@ -107,7 +108,20 @@ function parse_json_objects_and_arrays(sequence st)
 -- then go back and start at the top and process the content,
 -- when there are no more containers to process.
     --here.
-    
+    integer p = 1, flag
+    object x
+    while p <= length(st) do
+        x = st[p]
+        if integer(x) then
+            if x = ':' then
+                -- add to map
+                flag = 1
+            end if
+        else
+            -- do recursion
+        end if
+        p += 1
+    end while
     
     return {GET_SUCCESS, st}
 end function
@@ -116,11 +130,10 @@ public function parse(sequence json_string)
     -- parse JSON string to Euphoria object (key:value pairs)
 
     sequence s
-    s = sprintf("%s", {s})
-    --s = elementize_escape_chars(json_string)
-    --if s[1] != GET_SUCCESS then
-    --    return s
-    --end if
+    s = elementize_escape_chars(json_string)
+    if s[1] != GET_SUCCESS then
+        return s
+    end if
     s = elementize_strings(s[2])
     if s[1] != GET_SUCCESS then
         return s
