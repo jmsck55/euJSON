@@ -43,6 +43,14 @@ function elementize_strings(sequence st)
         end if
         st = replace(st, {st[start..pos]}, start, pos)
     end while
+    start = 0
+    while start < length(st) do
+        start = match("null", st, start + 1)
+        if not start then
+            exit
+        end if
+        st = replace(st, {"null"}, start, start + 3)
+    end while
     return {GET_SUCCESS, st}
 end function
 
