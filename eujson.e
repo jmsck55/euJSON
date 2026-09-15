@@ -8,9 +8,28 @@ include std/map.e
 include std/search.e
 public include std/get.e
 
+--with trace
+
 function elementize_escape_chars(sequence st, sequence escape_chars = "\\\'\"tnr")
     -- done.
-    integer pos
+    integer pos, f
+    sequence ret
+    pos = 1
+    while pos <= length(st) do
+        f = find(st[pos], "\"0123456789-+")
+        if f then
+            ret = value(st, pos, GET_LONG_ANSWER)
+            if ret[1] != GET_SUCCESS then
+                return ret
+            end if
+            if atom(ret[2]) then
+                st = st[1..pos - 1] & ret[2] & st[pos + ret[3]..$]
+            else
+                st = replace(st, {"\"" & ret[2] & "\""}, pos, pos + ret[3] - 1)
+            end if
+        end if
+        pos += 1
+    end while
     pos = 1
     while pos < length(st) do
         pos = find('\\', st, pos)
@@ -30,27 +49,31 @@ end function
 
 function elementize_strings(sequence st)
     -- done.
-    integer start, pos
-    start = 0
-    while start < length(st) do
-        start = find('\"', st, start + 1)
-        if not start then
-            exit
-        end if
-        pos = find('\"', st, start + 1)
-        if not pos then
-            return {GET_EOF, st} -- syntax error
-        end if
-        st = replace(st, {st[start..pos]}, start, pos)
-    end while
-    start = 0
-    while start < length(st) do
-        start = match("null", st, start + 1)
-        if not start then
-            exit
-        end if
-        st = replace(st, {"null"}, start, start + 3)
-    end while
+    sequence data = {"null", "true", "false"}
+    integer start--, pos
+--    start = 0
+--    while start < length(st) do
+--        start = find('\"', st, start + 1)
+--        if not start then
+--            exit
+--        end if
+--        pos = find('\"', st, start + 1)
+--        if not pos then
+--            return {GET_EOF, st} -- syntax error
+--        end if
+--        st = replace(st, {st[start..pos]}, start, pos)
+--    end while
+    for i = 1 to length(data) do
+        start = 0
+        while start < length(st) do
+            start = match(data[i], st, start + 1)
+            if not start then
+                exit
+            end if
+            st = st[1..start - 1] & {data[i]} & st[start + length(data[i])..$]
+            start += length(data[i]) - 1
+        end while
+    end for
     return {GET_SUCCESS, st}
 end function
 
@@ -116,17 +139,41 @@ function parse_json_objects_and_arrays(sequence st)
 -- then go back and start at the top and process the content,
 -- when there are no more containers to process.
     --here.
-    integer p = 1, flag
+    integer p = 1, i, f, flag
     object x
+    sequence ret
     while p <= length(st) do
         x = st[p]
-        if integer(x) then
+        if sequence(x) then
+            -- do recursion
+            i = 1
+            while i <= length(x) do
+                if atom(x[i]) then
+                    x[i] = {x[i]}
+                end if
+                ret = parse_json_objects_and_arrays(x[i])
+                x[i] = ret[2]
+                if length(x[i]) = 0 then
+                    x = x[1..i - 1] & x[i + 1..$]
+                else
+                    i += 1
+                end if
+            end while
+            st[p] = x
+        else
+            f = find(x, "{[}]\n\r\t ")
+            if f then
+                -- remove whitespace
+                st = st[1..p - 1] & st[p + 1..$]
+            end if
+            if f = 1 then
+                
+            end if
+
             if x = ':' then
                 -- add to map
                 flag = 1
             end if
-        else
-            -- do recursion
         end if
         p += 1
     end while
@@ -158,9 +205,11 @@ public function parse(sequence json_string)
     return s
 end function
 
+/*
 public function stringify(sequence obj)
     -- encode Euphoria object to JSON string.
     sequence json_string
 
     return json_string
 end function
+*/

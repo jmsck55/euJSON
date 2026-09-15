@@ -7,10 +7,10 @@ end ifdef
 
 include eujson.e
 
-integer fn = open("test.json", "r")
-sequence test = gets(fn)
-close(fn)
-/*
+--integer fn = open("test.json", "r")
+--sequence test = gets(fn)
+--close(fn)
+
 sequence test = `
 {
 "name":"John",
@@ -18,7 +18,7 @@ sequence test = `
 "cars":["Ford", "BMW", "Fiat"],
 "cars2":[["Ford"], ["BMW"], ["Fiat"]]
 }`
-*/
+
 trace(1)
 
 object ob
